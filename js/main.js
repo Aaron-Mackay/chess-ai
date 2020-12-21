@@ -5,8 +5,11 @@ var squareToHighlight = null
 var squareClass = 'square-55d63'
 var $status = $('#status')
 var $fen = $('#fen')
-var $pgn = $('#pgn')
+var $score = $('#score')
 var globalSum = 0;
+
+var $moves = $('#moves')
+const moves = [];
 
 
 
@@ -55,14 +58,22 @@ function makeRandomMove() {
     //var randomIdx = Math.floor(Math.random() * possibleMoves.length)
     //var move = possibleMoves[randomIdx]
 
-    const depth = 3;
+    var depth = parseInt($('#search-depth').find(':selected').text());
+    var t0 = performance.now()
 
     var [move, moveValue] = minimax(game, depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, globalSum, "b");
 
-    console.log(move);
+    console.log(performance.now());
     game.move(move.san);
+
+    var t1 = performance.now()
+
+    moves.push(`B: ${move.san} - ${Math.round(t1 - t0)}ms at depth ${depth}`)
+    $moves.html(moves.join('<br>'))
+
+
     globalSum = evaluateBoard(move, globalSum, 'b');
-    console.log("b score:", globalSum);
+
 
     // highlight black's move
     removeHighlights('black')
@@ -82,6 +93,8 @@ function onDrop(source, target) {
         to: target,
         promotion: 'q' // NOTE: always promote to a queen for example simplicity
     })
+    moves.push(`W: ${move.san}`)
+    $moves.html(moves.join('<br>'))
 
     // illegal move
     if (move === null) return 'snapback'
@@ -90,6 +103,8 @@ function onDrop(source, target) {
     removeHighlights('white')
     $board.find('.square-' + source).addClass('highlight-white')
     $board.find('.square-' + target).addClass('highlight-white')
+
+
 
     updateStatus()
     // make random move for black
@@ -162,11 +177,10 @@ function updateStatus() {
         }
     }
 
+
     $status.html(status)
     let fen = game.fen()
-    console.log(fen);
     $fen.html(fen)
-    $pgn.html(game.pgn())
 }
 
 var config = {
