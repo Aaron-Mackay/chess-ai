@@ -6,6 +6,7 @@ var squareClass = 'square-55d63'
 var $status = $('#status')
 var $fen = $('#fen')
 var $pgn = $('#pgn')
+var globalSum = 0;
 
 
 
@@ -44,16 +45,24 @@ function onDragStart(source, piece, position, orientation) {
 }
 
 function makeRandomMove() {
-    var possibleMoves = game.moves({
-        verbose: true
-    })
+    // var possibleMoves = game.moves({
+    //     verbose: true
+    // })
 
-    // game over
-    if (possibleMoves.length === 0) return
+    // // game over
+    // if (possibleMoves.length === 0) return
 
-    var randomIdx = Math.floor(Math.random() * possibleMoves.length)
-    var move = possibleMoves[randomIdx]
-    game.move(move.san)
+    //var randomIdx = Math.floor(Math.random() * possibleMoves.length)
+    //var move = possibleMoves[randomIdx]
+
+    const depth = 3;
+
+    var [move, moveValue] = minimax(game, depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, globalSum, "b");
+
+    console.log(move);
+    game.move(move.san);
+    globalSum = evaluateBoard(move, globalSum, 'b');
+    console.log("b score:", globalSum);
 
     // highlight black's move
     removeHighlights('black')
@@ -62,6 +71,7 @@ function makeRandomMove() {
 
     // update the board to the new position
     board.position(game.fen())
+    updateStatus()
 }
 
 function onDrop(source, target) {
@@ -81,8 +91,10 @@ function onDrop(source, target) {
     $board.find('.square-' + source).addClass('highlight-white')
     $board.find('.square-' + target).addClass('highlight-white')
 
+    updateStatus()
     // make random move for black
     window.setTimeout(makeRandomMove, 250)
+    updateStatus()
 }
 
 function onMouseoverSquare(square, piece) {
@@ -111,7 +123,6 @@ function onMouseoutSquare(square, piece) {
 function onMoveEnd() {
     $board.find('.square-' + squareToHighlight)
         .addClass('highlight-black')
-    updateStatus()
 }
 
 // update the board position after the piece snap
@@ -123,6 +134,7 @@ function onSnapEnd() {
 
 
 function updateStatus() {
+    console.log("updating");
     var status = ''
 
     var moveColor = 'White'
@@ -151,7 +163,9 @@ function updateStatus() {
     }
 
     $status.html(status)
-    $fen.html(game.fen())
+    let fen = game.fen()
+    console.log(fen);
+    $fen.html(fen)
     $pgn.html(game.pgn())
 }
 
