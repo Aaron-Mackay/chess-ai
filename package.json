@@ -1,0 +1,32 @@
+{
+  "name": "chess-ai",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aaron-Mackay/chess-ai.git"
+  },
+  "files": ["dist/"],
+  "dependencies": {
+    "jquery": ">=3.4.1",
+    "chess.js": "^0.11.0"
+  },
+  "devDependencies": {
+    "csso": "3.5.1",
+    "fs-plus": "3.1.1",
+    "kidif": "1.1.0",
+    "mustache": "2.3.0",
+    "standard": "10.0.2",
+    "uglify-js": "3.6.0"
+  },
+  "scripts": {
+    "build": "standard lib/chessboard.js && node scripts/build.js",
+    "standard": "standard --fix lib/*.js website/js/*.js",
+    "website": "node scripts/website.js"
+  },
+  "bugs": {
+    "url": "https://github.com/Aaron-Mackay/chess-ai/issues"
+  },
+  "homepage": "https://github.com/Aaron-Mackay/chess-ai#readme",
+  "license": "ISC"
+}
