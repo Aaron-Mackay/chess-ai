@@ -11,14 +11,15 @@
     <script defer src="js/chessboard-1.0.0.min.js">
     </script>
 
+    <!--  Including jQuery, another tool chessboardjs uses:-->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <!-- Chess JS (slightly modified) -->
     <script defer src="./node_modules/chess.js/chess.js"></script>
     <script defer src="js/evalFunction.js"></script>
     <script defer src="js/minimax.js"></script>
     <script defer src="js/main.js"></script>
 
-    <!--  Including jQuery, another tool chessboardjs uses:-->
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
 
     <style type="text/css">
         .highlight-white {
@@ -37,13 +38,11 @@
     <div id="status"></div>
     <label>FEN:</label>
     <div id="fen"></div>
-    <label>PGN:</label>
-    <div id="pgn"></div>
     <label>Score:</label>
     <div id="score"></div>
     <div class="row align-items-center justify-content-center">
         <div class="form-group">
-            <label for="search-depth">Search Depth (Black):</label>
+            <label for="search-depth">Search Depth:</label>
             <select id="search-depth">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -51,13 +50,14 @@
                 <option value="4">4</option>
                 <option value="5">5</option>
                 <option value="6">6</option>
-                <option value="7">7</option>
+                <!-- <option value="7">7</option>
                 <option value="8">8</option>
                 <option value="9">9</option>
-                <option value="10">10</option>
+                <option value="10">10</option> -->
             </select>
         </div>
     </div>
+    <button disabled id=suggestion>Suggestion</button>
     <label>Moves:</label>
     <div id="moves"></div>
 </body>

@@ -6,35 +6,63 @@ var squareClass = 'square-55d63'
 var $status = $('#status')
 var $fen = $('#fen')
 var $score = $('#score')
+var $suggestion = $('#suggestion')
 var globalSum = 0;
 
 var $moves = $('#moves')
 const moves = [];
 
 
+function findBest() {
+    console.log("finding best move");
+    var depth = parseInt($('#search-depth').find(':selected').text());
+    var [move, moveValue] = minimax(game, depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, -globalSum, "w");
+    console.log(move);
+    console.log("found best move");
+    // enable button
+    $suggestion.off('click').click(() => { highlightBest(move) });
+    $suggestion.prop('disabled', false);
+}
 
+function highlightBest(move) {
+    console.log("highlighting", move.to, move.from)
+    colorSquare(move.to, "green")
+    colorSquare(move.from, "green")
+}
 
 
 // ========================================== chess.js code
 var whiteSquareGrey = '#a9a9a9'
 var blackSquareGrey = '#696969'
+var whiteSquareGreen = '#26b53c'
+var blackSquareGreen = '#187326'
 
-function removeGreySquares() {
-    $('#myBoard .square-55d63').css('background', '')
+function removeColorSquares(color = "grey") {
+    console.log("removing", color);
+
+    $(`#myBoard .${color}`).css('background', '').removeClass(color)
 }
 
-function greySquare(square) {
+function colorSquare(square, color = "grey") {
+    console.log(color, square);
+
     var $square = $('#myBoard .square-' + square)
 
-    var background = whiteSquareGrey
-    if ($square.hasClass('black-3c85d')) {
-        background = blackSquareGrey
+    if ($square.hasClass("green")) {
+        return;
     }
 
-    $square.css('background', background)
+
+    var background = color === "grey" ? whiteSquareGrey : whiteSquareGreen
+    if ($square.hasClass('black-3c85d')) {
+        background = color === "grey" ? blackSquareGrey : blackSquareGreen
+    }
+
+    $square.css('background', background).addClass(color)
 }
 
 function removeHighlights(color) {
+    console.log("removing");
     $board.find('.' + squareClass)
         .removeClass('highlight-' + color)
 }
@@ -63,7 +91,6 @@ function makeRandomMove() {
 
     var [move, moveValue] = minimax(game, depth, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true, globalSum, "b");
 
-    console.log(performance.now());
     game.move(move.san);
 
     var t1 = performance.now()
@@ -83,10 +110,12 @@ function makeRandomMove() {
     // update the board to the new position
     board.position(game.fen())
     updateStatus()
+
 }
 
 function onDrop(source, target) {
-    removeGreySquares()
+    removeColorSquares("green")
+    removeColorSquares("grey")
     // see if the move is legal
     var move = game.move({
         from: source,
@@ -104,7 +133,7 @@ function onDrop(source, target) {
     $board.find('.square-' + source).addClass('highlight-white')
     $board.find('.square-' + target).addClass('highlight-white')
 
-
+    $suggestion.prop('disabled', true);
 
     updateStatus()
     // make random move for black
@@ -114,30 +143,32 @@ function onDrop(source, target) {
 
 function onMouseoverSquare(square, piece) {
     // get list of possible moves for this square
-    var moves = game.moves({
+    var possMoves = game.moves({
         square: square,
         verbose: true
     })
 
     // exit if there are no moves available for this square
-    if (moves.length === 0) return
+    if (possMoves.length === 0) return
 
     // highlight the square they moused over
-    greySquare(square)
+    colorSquare(square)
 
     // highlight the possible squares for this piece
-    for (var i = 0; i < moves.length; i++) {
-        greySquare(moves[i].to)
+    for (var i = 0; i < possMoves.length; i++) {
+        colorSquare(possMoves[i].to)
     }
 }
 
 function onMouseoutSquare(square, piece) {
-    removeGreySquares()
+    removeColorSquares()
 }
 
+// Computer turn end
 function onMoveEnd() {
     $board.find('.square-' + squareToHighlight)
         .addClass('highlight-black')
+    findBest()
 }
 
 // update the board position after the piece snap
@@ -194,4 +225,5 @@ var config = {
     onSnapEnd: onSnapEnd
 }
 board = Chessboard('myBoard', config)
+findBest()
 updateStatus()
